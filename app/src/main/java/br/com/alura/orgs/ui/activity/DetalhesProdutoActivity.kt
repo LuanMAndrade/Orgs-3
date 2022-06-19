@@ -58,11 +58,11 @@ class DetalhesProdutoActivity : AppCompatActivity() {
 
     private fun preencheCampos(produtoCarregado: Produto) {
         with(binding) {
-            activityDetalhesProdutoImagem.tentaCarregarImagem(produtoCarregado.imagem)
-            activityDetalhesProdutoNome.text = produtoCarregado.nome
-            activityDetalhesProdutoDescricao.text = produtoCarregado.descricao
+            activityDetalhesProdutoImagem.tentaCarregarImagem(produto.imagem)
+            activityDetalhesProdutoNome.text = produto.nome
+            activityDetalhesProdutoDescricao.text = produto.descricao
             activityDetalhesProdutoValor.text =
-                produtoCarregado.valor.formataParaMoedaBrasileira()
+                produto.valor.formataParaMoedaBrasileira()
         }
     }
 
