@@ -15,7 +15,8 @@ class FormularioProdutoActivity : AppCompatActivity() {
         ActivityFormularioProdutoBinding.inflate(layoutInflater)
     }
     private var url: String? = null
-
+    private var idProduto = 0L
+    private val produtoDao by lazy { AppDatabase.instance(this).produtoDao() }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -28,6 +29,21 @@ class FormularioProdutoActivity : AppCompatActivity() {
                     binding.activityFormularioProdutoImagem.tentaCarregarImagem(url)
                 }
         }
+
+        val idProduto = intent.getLongExtra("ID",0L)
+        title = "Alterar Produto"
+        val produtoCarregado = produtoDao.searchById(idProduto)
+        produtoCarregado?.let {
+            url = produtoCarregado.imagem
+            with(binding) {
+                activityFormularioProdutoNome.setText(produtoCarregado.nome)
+                activityFormularioProdutoDescricao.setText(produtoCarregado.descricao)
+                activityFormularioProdutoValor.setText(produtoCarregado.valor.toPlainString())
+                activityFormularioProdutoImagem.tentaCarregarImagem(produtoCarregado.imagem)
+            }} ?: finish()
+
+
+
     }
 
     private fun configuraBotaoSalvar() {
@@ -54,6 +70,7 @@ class FormularioProdutoActivity : AppCompatActivity() {
         }
 
         return Produto(
+            id = idProduto,
             nome = nome,
             descricao = descricao,
             valor = valor,

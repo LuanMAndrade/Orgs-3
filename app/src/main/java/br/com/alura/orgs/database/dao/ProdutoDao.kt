@@ -8,14 +8,14 @@ import br.com.alura.orgs.model.Produto
 interface ProdutoDao {
 
     @Query("SELECT * FROM Produto")
-    fun search() : List<Produto>
+    fun search(): List<Produto>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(produto: Produto)
 
     @Delete
     fun delete(produto: Produto)
 
-    @Update
-    fun update(produto: Produto)
+    @Query("SELECT * FROM Produto WHERE id= :id")
+    fun searchById(id: Long): Produto?
 }
