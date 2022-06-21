@@ -1,6 +1,7 @@
 package br.com.alura.orgs.ui.activity
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityFormularioProdutoBinding
@@ -17,6 +18,7 @@ class FormularioProdutoActivity : AppCompatActivity() {
     private var url: String? = null
     private var idProduto = 0L
     private val produtoDao by lazy { AppDatabase.instance(this).produtoDao() }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
@@ -29,26 +31,26 @@ class FormularioProdutoActivity : AppCompatActivity() {
                     binding.activityFormularioProdutoImagem.tentaCarregarImagem(url)
                 }
         }
-
-        val idProduto = intent.getLongExtra("ID",0L)
-        title = "Alterar Produto"
-        val produtoCarregado = produtoDao.searchById(idProduto)
-        produtoCarregado?.let {
-            url = produtoCarregado.imagem
-            with(binding) {
-                activityFormularioProdutoNome.setText(produtoCarregado.nome)
-                activityFormularioProdutoDescricao.setText(produtoCarregado.descricao)
-                activityFormularioProdutoValor.setText(produtoCarregado.valor.toPlainString())
-                activityFormularioProdutoImagem.tentaCarregarImagem(produtoCarregado.imagem)
-            }} ?: finish()
-
+        idProduto = intent.getLongExtra("ID", 0L)
+        if (idProduto != 0L) {
+            title = "Alterar Produto"
+            val produtoCarregado = produtoDao.searchById(idProduto)
+            produtoCarregado?.let {
+                url = produtoCarregado.imagem
+                with(binding) {
+                    activityFormularioProdutoNome.setText(produtoCarregado.nome)
+                    activityFormularioProdutoDescricao.setText(produtoCarregado.descricao)
+                    activityFormularioProdutoValor.setText(produtoCarregado.valor.toPlainString())
+                    activityFormularioProdutoImagem.tentaCarregarImagem(produtoCarregado.imagem)
+                }
+            } ?: finish()
+        }
 
 
     }
 
     private fun configuraBotaoSalvar() {
         val botaoSalvar = binding.activityFormularioProdutoBotaoSalvar
-        val produtoDao = AppDatabase.instance(this).produtoDao()
         botaoSalvar.setOnClickListener {
             val produtoNovo = criaProduto()
             produtoDao.insert(produtoNovo)
