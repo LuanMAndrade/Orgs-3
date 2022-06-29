@@ -8,6 +8,7 @@ import br.com.alura.orgs.databinding.ActivityFormularioProdutoBinding
 import br.com.alura.orgs.extensions.tentaCarregarImagem
 import br.com.alura.orgs.model.Produto
 import br.com.alura.orgs.ui.dialog.FormularioImagemDialog
+import kotlinx.coroutines.*
 import java.math.BigDecimal
 
 class FormularioProdutoActivity : AppCompatActivity() {
@@ -18,6 +19,7 @@ class FormularioProdutoActivity : AppCompatActivity() {
     private var url: String? = null
     private var idProduto = 0L
     private val produtoDao by lazy { AppDatabase.instance(this).produtoDao() }
+    private val job = Job()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,18 +36,21 @@ class FormularioProdutoActivity : AppCompatActivity() {
         idProduto = intent.getLongExtra("ID", 0L)
         if (idProduto != 0L) {
             title = "Alterar Produto"
-            val produtoCarregado = produtoDao.searchById(idProduto)
-            produtoCarregado?.let {
-                url = produtoCarregado.imagem
-                with(binding) {
-                    activityFormularioProdutoNome.setText(produtoCarregado.nome)
-                    activityFormularioProdutoDescricao.setText(produtoCarregado.descricao)
-                    activityFormularioProdutoValor.setText(produtoCarregado.valor.toPlainString())
-                    activityFormularioProdutoImagem.tentaCarregarImagem(produtoCarregado.imagem)
-                }
-            } ?: finish()
+            val job1 = MainScope().launch(job) {
+                val produtoCarregado = withContext(Dispatchers.IO){
+                produtoDao.searchById(idProduto)}
+                produtoCarregado?.let {
+                    url = produtoCarregado.imagem
+                    with(binding) {
+                        activityFormularioProdutoNome.setText(produtoCarregado.nome)
+                        activityFormularioProdutoDescricao.setText(produtoCarregado.descricao)
+                        activityFormularioProdutoValor.setText(produtoCarregado.valor.toPlainString())
+                        activityFormularioProdutoImagem.tentaCarregarImagem(produtoCarregado.imagem)
+                    }
+                } ?: finish()
+            }
+            job1.cancel()
         }
-
 
     }
 

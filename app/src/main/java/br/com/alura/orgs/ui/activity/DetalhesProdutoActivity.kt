@@ -5,12 +5,14 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat.startActivity
 import br.com.alura.orgs.R
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityDetalhesProdutoBinding
 import br.com.alura.orgs.extensions.formataParaMoedaBrasileira
 import br.com.alura.orgs.extensions.tentaCarregarImagem
 import br.com.alura.orgs.model.Produto
+import kotlinx.coroutines.*
 
 class DetalhesProdutoActivity : AppCompatActivity() {
 
@@ -20,6 +22,7 @@ class DetalhesProdutoActivity : AppCompatActivity() {
         ActivityDetalhesProdutoBinding.inflate(layoutInflater)
     }
     private val produtoDao by lazy { AppDatabase.instance(this).produtoDao() }
+    private val job = Job()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,10 +32,14 @@ class DetalhesProdutoActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        produto = produtoDao.searchById(id)
-        produto?.let {
-            preencheCampos(it)
-        } ?: finish()
+        val job1 = MainScope().launch(job) {
+            withContext(Dispatchers.IO){
+            produto = produtoDao.searchById(id)}
+            produto?.let {
+                preencheCampos(it)
+            } ?: finish()
+        }
+        job1.cancel()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
