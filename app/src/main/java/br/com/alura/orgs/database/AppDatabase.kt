@@ -18,7 +18,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
         fun instance(context: Context): AppDatabase {
-            return Room.databaseBuilder(context, AppDatabase::class.java,"Orgs.db").build()
+            return Room.databaseBuilder(context, AppDatabase::class.java,"Orgs.db").allowMainThreadQueries().build()
         }
     }
 }

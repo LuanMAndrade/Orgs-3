@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.startActivity
+import androidx.lifecycle.Lifecycle
 import br.com.alura.orgs.database.AppDatabase
 import br.com.alura.orgs.databinding.ActivityListaProdutosActivityBinding
 import br.com.alura.orgs.ui.recyclerview.adapter.ListaProdutosAdapter
@@ -14,8 +15,6 @@ class ListaProdutosActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityListaProdutosActivityBinding.inflate(layoutInflater)
     }
-    private val scope = MainScope()
-    private val job = Job()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,15 +25,9 @@ class ListaProdutosActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        val job1 = scope.launch(job) {
-        val produto = withContext(Dispatchers.IO) {AppDatabase.instance(this@ListaProdutosActivity).produtoDao().search()
-        }
+       val produto = AppDatabase.instance(this@ListaProdutosActivity)
+            .produtoDao().search()
         adapter.atualiza(produto)
-    } }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        job.cancel()
     }
 
 
